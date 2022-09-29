@@ -78,20 +78,31 @@ import time
 path = "text.txt"
 text = ""
 
+exit_event = threading.Event()
+
 def readFile():
     global path, text
     while True:
-        with open("text.txt", "r") as f:
+        with open(path, "r") as f:
             text = f.read()
         time.sleep(3)
+
+        if exit_event.is_set():
+            break
+
+    print(f"Terminating the reading process...")
+
 
 def printLoop():
     for x in range(30):
         print(text)
         time.sleep(1)
 
-t1 = threading.Thread(target=readFile, daemon=True)
-t2 = threading.Thread(target=printLoop)
 
+t1 = threading.Thread(target=readFile)
+t2 = threading.Thread(target=printLoop)
 t1.start()
 t2.start()
+
+time.sleep(4)
+exit_event.set()
